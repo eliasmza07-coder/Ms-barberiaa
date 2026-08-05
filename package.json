@@ -9,5 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "vite": "^5.0.0"
   }
 }
