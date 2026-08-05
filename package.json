@@ -5,10 +5,7 @@
   "private": true,
   "description": "Motor de disponibilidad, seguridad y modelo de agenda para MS Barbería",
   "scripts": {
-    "test": "node --test \"test/*.test.js\""
+    "test": "node --test \"test/*.test.js\"",
+    "start": "node index.js"
   }
-}
-"scripts": {
-  "test": "node --test \"test/*.test.js\"",
-  "start": "node index.js"
 }
