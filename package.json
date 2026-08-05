@@ -8,3 +8,7 @@
     "test": "node --test \"test/*.test.js\""
   }
 }
+"scripts": {
+  "test": "node --test \"test/*.test.js\"",
+  "start": "node index.js"
+}
