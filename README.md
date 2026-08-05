@@ -1,110 +1,92 @@
-# MS Barbería y Peluquería
+# MS Barbería — paquete de mejoras v14
 
-Landing pública + sistema de reservas + panel administrativo, en JavaScript
-puro (ES Modules) con Vite y Supabase. Sin frameworks (React/Vue/Angular).
+Entrega modular sobre el proyecto `ms-barberia-v13`. **No reemplaza nada**:
+son archivos nuevos que se copian sobre el proyecto existente, más
+migraciones SQL que se corren en orden.
 
-Este proyecto es el rediseño arquitectónico del `index.html` original de
-una sola pieza: **mismo comportamiento, misma base de datos, misma Edge
-Function** — reorganizado en capas (`UI → Controllers → Services →
-Repositories → Supabase`) y en módulos por feature. El detalle completo de
-la arquitectura, el modelo de datos y el plan de migración está en
-[`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md).
+Todo está adaptado al esquema **real** de tu base de datos (el del diagrama
+de Supabase), que en varios puntos no coincide con `db/SUPABASE_SETUP.sql`.
 
-## Requisitos
+---
 
-- Node.js 18+
-- Una cuenta/proyecto de Supabase (ya existe uno en producción; ver `.env.example`)
+## Empezá acá
 
-## Puesta en marcha
+1. Leé `docs/DIAGNOSTICO.md` — qué está mal hoy y por qué.
+2. Seguí `docs/PLAN_IMPLEMENTACION.md` — los 7 pasos de instalación.
 
-```bash
-npm install
-npm run dev             # levanta Vite en http://localhost:5173
-```
+Lo más urgente: **la tabla `turnos` no tiene RLS activo**. Cualquiera con la
+anon key (que está en el bundle de JavaScript de tu página) puede
+descargarse el nombre y el teléfono de todos tus clientes, o borrar la
+agenda. Se arregla en el paso 2.
 
-No hace falta crear un `.env` para probarlo: `src/config/env.js` ya trae
-como *fallback* las mismas credenciales que traía el `index.html` original
-(la anon key de Supabase está pensada para ser pública). Si más adelante
-querés apuntar a otro proyecto de Supabase (staging, otra barbería), copiá
-`.env.example` a `.env` y completá esas variables — tienen prioridad sobre
-el fallback.
+---
 
-Build de producción:
-
-```bash
-npm run build     # genera dist/
-npm run preview   # sirve el build localmente para verificarlo
-```
-
-## Estructura
+## Contenido
 
 ```
+db/                                ← PARA PEGAR EN EL SQL EDITOR DE SUPABASE
+  1. SUPABASE_VERIFICAR.sql        Solo lectura. Radiografía de tu base. Correr PRIMERO.
+  2. SUPABASE_INSTALAR_TODO.sql    Todo el sistema, en un solo bloque. Idempotente.
+  3. SUPABASE_CONFIGURAR.sql       TUS horarios y TUS reglas. Editar antes de correr.
+  4. SUPABASE_VERIFICAR_POST.sql   Solo lectura. Confirma que quedó todo bien.
+
+db/migrations/                     ← lo mismo, separado por si preferís ir de a poco
+  005_preflight_verificacion.sql   = SUPABASE_VERIFICAR.sql
+  006_normalizacion_base.sql       Empareja tu base real con lo que el código asume.
+  007_motor_disponibilidad.sql     Modelo de agenda nuevo + estados + RLS + anti-doble-reserva.
+  008_funciones_reserva.sql        Validación y creación de reservas en el servidor (RPC).
+  009_limpieza_opcional.sql        Higiene. El único que borra cosas. NO es obligatorio.
+  (006 + 007 + 008 = SUPABASE_INSTALAR_TODO.sql)
+
 src/
-  config/        → conexión a Supabase, variables de entorno, constantes
-  shared/        → utilidades, repository base, servicios transversales (auth, realtime)
-  modules/       → una carpeta por feature: landing, reservations, services-catalog,
-                   schedule, auth, admin — cada una con su controller/service/repository
-  styles/        → CSS global dividido por responsabilidad (variables, base, animaciones)
-db/
-  migrations/    → 000 = esquema actual (referencia), 001 = esquema futuro propuesto (NO ejecutar aún)
+  shared/utils/datetime.utils.js               Fechas en la zona horaria del negocio.
+  modules/availability/availability.engine.js  Motor de disponibilidad (función pura).
+  modules/availability/availability.repository.js
+  modules/availability/availability.service.js Orquestación + adaptador compatible.
+  modules/services-catalog/*.js                Versión corregida (arregla el error 400).
+
+test/
+  availability.engine.test.js      18 tests con los casos borde del pliego.
+
 docs/
-  ARCHITECTURE.md → documento completo de arquitectura, DB, convenciones y plan de migración
+  DIAGNOSTICO.md                   Los 22 hallazgos, ordenados por riesgo real.
+  PLAN_IMPLEMENTACION.md           Instalación paso a paso + roadmap de lo que falta.
 ```
 
-## Base de datos
+---
 
-**Para configurar todo de una sola vez:** corré
-`db/migrations/SETUP_COMPLETO.sql` en el SQL Editor de Supabase — junta
-las migraciones 002, 003 y 004 en un solo script, es seguro correrlo más
-de una vez (no falla si ya ejecutaste algo de esto antes), y no toca
-ninguna tabla existente. Los archivos `002_*.sql` a `004_*.sql` se
-mantienen por separado solo como referencia histórica de qué se agregó y
-cuándo.
+## Correr los tests
 
-El código apunta a las mismas tablas que ya existían en producción:
-`servicios`, `turnos`, `dias_libres`, `horas_bloqueadas`, `config_jornada`,
-y a la Edge Function `gestionar-reserva` para crear una reserva. Nada de
-esto se modificó.
+No hace falta instalar nada: usa el runner nativo de Node (v18+).
 
-Además, ahora suma 6 tablas de contenido/reseñas y una tabla de perfiles
-para que el barbero administre **todo** el sitio desde el panel, sin
-depender del programador: `sitio_config`, `redes_sociales`,
-`experiencia_items`, `galeria`, `faq`, `resenas` y `perfiles` (cuentas
-opcionales de cliente). Están definidas en `db/migrations/002` a `004` —
-todas 100% aditivas, no tocan ni borran ninguna tabla existente, y se
-pueden correr tal cual sobre la base actual desde el SQL Editor de
-Supabase (en orden: 002, 003, 004).
+```bash
+cd ms-barberia-v14
+npm test
+```
 
-`004_cuentas_clientes.sql` agrega cuentas de cliente **opcionales** en el
-flujo de reservas ("Iniciar sesión" / "Crear cuenta" / seguir como
-invitado — el invitado sigue funcionando exactamente igual que siempre).
-Usa el mismo Supabase Auth que el panel admin, separado por rol
-(`perfiles.rol`: `'cliente'` o `'barbero'`) — un cliente que inicia sesión
-nunca ve el panel admin. **Requiere un paso manual único** después de
-correr la migración: asignarte el rol `'barbero'` a tu cuenta de admin ya
-existente (instrucciones al final del archivo SQL).
+Los 18 tests tienen que pasar. Cubren jornada partida, márgenes de
+limpieza, servicios combinados, anticipación mínima, horarios pasados,
+zona horaria y solapamiento con citas fuera de la grilla.
 
-El esquema ampliado multi-negocio (`reservations`, `services`, `customers`,
-etc.) sigue siendo una propuesta a futuro en
-`db/migrations/001_future_schema_multi_tenant.sql` — no aplicado, no hace
-falta para que el proyecto funcione.
+---
 
-## Diseño
+## Orden de aplicación, resumido
 
-Paleta monocromática blanco y negro (antes: dorado sobre fondo oscuro),
-alineada al logo/flyer de la marca. El emblema circular "MS" del navbar es
-una reconstrucción vectorial (SVG) inspirada en el logo original — si
-tenés el archivo vectorial real del logo (.svg/.ai/.pdf), decímelo y lo
-reemplazo por el original en vez de la reconstrucción.
+```
+BACKUP
+  → SUPABASE_VERIFICAR.sql       (leer el reporte, resolver los PROBLEMA)
+  → SUPABASE_INSTALAR_TODO.sql   (una sola pegada)
+  → SUPABASE_CONFIGURAR.sql      (editado con tus horarios)
+  → SUPABASE_VERIFICAR_POST.sql  (todo tiene que decir OK)
+  → curl con la anon key         (tiene que devolver [])
+  → copiar src/ al proyecto
+  → migrations/009               (opcional, semanas después)
+```
 
-Los colores funcionales del calendario (verde=libre, azul=reservado,
-rojo=bloqueado) se mantuvieron a color a propósito — son indicadores de
-estado, no parte de la identidad visual, y perderían utilidad en escala de
-grises.
+El instalador tiene un **candado**: si no hay ningún usuario con rol
+`barbero`, corta la ejecución antes de activar RLS y te dice exactamente
+qué correr. Sin ese freno, activar la seguridad te dejaría afuera de tu
+propio panel.
 
-## Convenciones
-
-Ver sección 9 de `docs/ARCHITECTURE.md` (nombres de archivos, carpetas,
-commits). Regla no negociable: ningún componente de UI ni controller
-importa `supabaseClient` directamente — solo los `*.repository.js` (y los
-servicios transversales `AuthService`/`RealtimeService`) lo hacen.
+Ningún script borra datos salvo el 009, que está claramente marcado y se
+puede saltear indefinidamente.
