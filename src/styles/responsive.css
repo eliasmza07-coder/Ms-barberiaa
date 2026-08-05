@@ -1,0 +1,8 @@
+/**
+ * styles/responsive.css
+ * Ajustes responsive transversales que no dependen de un componente en
+ * particular. Hoy el proyecto resuelve la mayoría del responsive con
+ * utilidades de Tailwind directamente en el markup (sm:, md:, lg:); este
+ * archivo queda como el lugar designado para reglas globales futuras
+ * (ej. ajustes de tipografía fluida) sin tener que tocar base.css.
+ */

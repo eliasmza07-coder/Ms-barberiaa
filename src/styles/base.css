@@ -1,0 +1,99 @@
+/**
+ * styles/base.css
+ * Migrado 1:1 desde el <style> inline del index.html original:
+ * reset mínimo, texturas, bordes de tarjeta, scrollbar, input date.
+ */
+html { scroll-behavior: smooth; }
+body { background-color: rgb(var(--color-ink-rgb)); -webkit-tap-highlight-color: transparent; }
+
+.texture-noise {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.card-edge {
+  border: 1px solid rgb(var(--color-ink-line-rgb));
+  position: relative;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-edge:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Header que se compacta al bajar el scroll */
+header { transition: box-shadow 0.3s ease; }
+header.header-compacto { box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.6); }
+header.header-compacto > div { padding-top: 0.65rem; padding-bottom: 0.65rem; transition: padding 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+.editorial-frame {
+  position: relative;
+}
+.editorial-frame::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgb(var(--color-ink-rgb)); }
+::-webkit-scrollbar-thumb { background: rgb(var(--color-ink-line-rgb)); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--color-gold-rgb)); }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+/* Barra lateral del panel admin */
+.sidebar-link, .sidebar-link-activo {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-family: var(--font-mono);
+  border-radius: 2px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+.sidebar-link { color: rgb(var(--color-bone-dim-rgb)); }
+.sidebar-link:hover { color: rgb(var(--color-bone-rgb)); background: rgba(255, 255, 255, 0.05); }
+.sidebar-link-activo { color: rgb(var(--color-ink-rgb)); background: rgb(var(--color-gold-rgb)); font-weight: 600; }
+
+/* Accesos rápidos del Dashboard */
+.dash-acceso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem;
+  border: 1px solid rgb(var(--color-ink-line-rgb));
+  background: rgb(var(--color-ink-surface-rgb));
+  color: rgb(var(--color-bone-rgb));
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: var(--font-mono);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.dash-acceso:hover { border-color: rgb(var(--color-gold-rgb)); color: rgb(var(--color-gold-rgb)); transform: translateY(-1px); }
+
+/* Tarjeta de estadística del Dashboard */
+.stat-card {
+  border: 1px solid rgb(var(--color-ink-line-rgb));
+  background: rgb(var(--color-ink-surface-rgb));
+  padding: 1.1rem 1.25rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stat-card:hover { border-color: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+
+/* Tarjetas de servicio del wizard de reserva */
+.tarjeta-servicio { cursor: pointer; }
+.tarjeta-servicio:hover { transform: translateY(-2px); }

@@ -1,0 +1,12 @@
+/**
+ * styles/main.css
+ * Único archivo de estilos importado desde main.js. Importa, en orden,
+ * los tokens, el reset/base, las animaciones y el responsive global.
+ * Los estilos propios de cada componente/módulo se importan desde su
+ * propio archivo JS (ver modules/*//*.css) para mantener el CSS
+ * co-localizado con el componente que lo usa.
+ */
+@import './variables.css';
+@import './base.css';
+@import './animations.css';
+@import './responsive.css';

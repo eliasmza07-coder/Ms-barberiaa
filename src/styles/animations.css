@@ -1,0 +1,22 @@
+/**
+ * styles/animations.css
+ * Migrado 1:1 desde los keyframes definidos en tailwind.config del
+ * index.html original (fadeIn, fadeInUp, scaleIn). Tailwind sigue
+ * generando las clases de animación (animate-fade-in, etc.) vía su
+ * config en index.html; acá quedan documentados/disponibles también
+ * como CSS puro por si se necesitan fuera de una clase utilitaria.
+ */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  0% { opacity: 0; transform: scale(0.95) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}

@@ -1,0 +1,32 @@
+/**
+ * styles/variables.css
+ * Tokens de diseño extraídos de tailwind.config (colores, tipografías)
+ * del index.html original, expuestos también como CSS custom properties
+ * para que en el futuro el módulo de Apariencia (admin) pueda sobreescribirlos
+ * en runtime sin recompilar nada.
+ */
+:root {
+  /* Formato "R G B" (sin comas) — así Tailwind puede combinarlo con
+     modificadores de opacidad como bg-gold/10, shadow-gold/20, etc.
+     Ver tailwind.config dentro de index.html: usa rgb(var(...) / <alpha-value>). */
+  --color-ink-rgb: 10 10 10;            /* #0A0A0A */
+  --color-ink-soft-rgb: 18 18 18;       /* #121212 */
+  --color-ink-surface-rgb: 26 26 26;    /* #1A1A1A */
+  --color-ink-line-rgb: 46 46 46;       /* #2E2E2E */
+
+  --color-bone-rgb: 245 245 244;        /* #F5F5F4 */
+  --color-bone-dim-rgb: 154 154 152;    /* #9A9A98 */
+
+  --color-gold-rgb: 232 232 230;        /* #E8E8E6 */
+  --color-gold-bright-rgb: 255 255 255; /* #FFFFFF */
+  --color-gold-dim-rgb: 138 138 136;    /* #8A8A88 */
+
+  --color-libre: #3FA35C;
+  --color-reservado: #3B82C4;
+  --color-pendiente: #D97706;
+  --color-bloqueado: #C4453B;
+
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Jost', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
